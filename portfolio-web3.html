@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wilzeelbub.eth — Web3 Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080c10;
+    --bg2: #0d1219;
+    --bg3: #111820;
+    --accent: #00ffa3;
+    --accent2: #00c8ff;
+    --accent3: #7b5ea7;
+    --text: #e8edf2;
+    --muted: #5a6a7a;
+    --border: rgba(0,255,163,0.12);
+    --card: rgba(255,255,255,0.03);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Space Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease, opacity 0.2s;
+    transform: translate(-50%, -50%);
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(0,255,163,0.4);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.08s ease, width 0.2s, height 0.2s;
+  }
+
+  /* Grid noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,255,163,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,255,163,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Scanlines */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.04) 2px,
+      rgba(0,0,0,0.04) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.2rem 4rem;
+    border-bottom: 1px solid var(--border);
+    background: rgba(8,12,16,0.85);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  .nav-logo span { color: var(--text); }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px; left: 0;
+    width: 0; height: 1px;
+    background: var(--accent);
+    transition: width 0.3s;
+  }
+
+  .nav-links a:hover { color: var(--accent); }
+  .nav-links a:hover::after { width: 100%; }
+
+  .nav-badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .nav-badge::before {
+    content: '● ';
+    animation: blink 1.5s step-end infinite;
+  }
+
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding: 6rem 4rem 4rem;
+    z-index: 2;
+    overflow: hidden;
+  }
+
+  .hero-glow {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,255,163,0.06) 0%, transparent 70%);
+    top: 10%; left: -10%;
+    pointer-events: none;
+    animation: float 8s ease-in-out infinite;
+  }
+
+  .hero-glow2 {
+    position: absolute;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(0,200,255,0.05) 0%, transparent 70%);
+    bottom: 10%; right: -5%;
+    pointer-events: none;
+    animation: float 10s ease-in-out infinite reverse;
+  }
+
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-30px); }
+  }
+
+  .hero-content { max-width: 800px; }
+
+  .hero-tag {
+    display: inline-block;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    border-left: 2px solid var(--accent);
+    padding-left: 1rem;
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title .line1 { display: block; color: var(--text); }
+  .hero-title .line2 {
+    display: block;
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(0,255,163,0.5);
+    position: relative;
+  }
+  .hero-title .line3 {
+    display: block;
+    color: var(--accent);
+  }
+
+  .hero-desc {
+    font-size: 0.8rem;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 480px;
+    margin-bottom: 2.5rem;
+  }
+
+  .hero-desc strong { color: var(--accent2); font-weight: 400; }
+
+  .hero-ctas {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    background: var(--accent);
+    color: var(--bg);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    cursor: none;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,255,163,0.3);
+  }
+
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 2rem;
+    background: transparent;
+    color: var(--text);
+    text-decoration: none;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    transition: border-color 0.2s, color 0.2s;
+    cursor: none;
+  }
+
+  .btn-ghost:hover { border-color: rgba(0,255,163,0.5); color: var(--accent); }
+
+  .hero-stats {
+    position: absolute;
+    right: 4rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .stat-item {
+    text-align: right;
+    border-right: 1px solid var(--border);
+    padding-right: 1.5rem;
+  }
+
+  .stat-number {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-top: 0.3rem;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .scroll-line {
+    width: 1px; height: 40px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+    animation: scrolldown 2s ease-in-out infinite;
+  }
+
+  @keyframes scrolldown {
+    0% { opacity: 0; transform: scaleY(0); transform-origin: top; }
+    50% { opacity: 1; transform: scaleY(1); }
+    100% { opacity: 0; transform: translateY(40px); }
+  }
+
+  /* SECTIONS */
+  section {
+    position: relative;
+    z-index: 2;
+    padding: 6rem 4rem;
+  }
+
+  .section-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .section-label::before {
+    content: '';
+    display: block;
+    width: 30px; height: 1px;
+    background: var(--accent);
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+    margin-bottom: 3rem;
+    line-height: 1.1;
+  }
+
+  .section-title em {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(0,255,163,0.6);
+    font-style: normal;
+  }
+
+  /* SKILLS */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1px;
+    border: 1px solid var(--border);
+  }
+
+  .skill-card {
+    background: var(--card);
+    padding: 2rem;
+    border: 1px solid transparent;
+    transition: background 0.3s, border-color 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), transparent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s;
+  }
+
+  .skill-card:hover { background: rgba(0,255,163,0.04); border-color: var(--border); }
+  .skill-card:hover::before { transform: scaleX(1); }
+
+  .skill-icon {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .skill-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+
+  .skill-desc {
+    font-size: 0.7rem;
+    line-height: 1.8;
+    color: var(--muted);
+    margin-bottom: 1.2rem;
+  }
+
+  .skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tag {
+    font-size: 0.6rem;
+    padding: 0.2rem 0.6rem;
+    background: rgba(0,255,163,0.08);
+    color: var(--accent);
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    border: 1px solid rgba(0,255,163,0.15);
+  }
+
+  /* PROJECTS */
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1rem;
+  }
+
+  .project-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2rem;
+    transition: border-color 0.3s, transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .project-card:hover {
+    border-color: rgba(0,255,163,0.4);
+    transform: translateY(-4px);
+  }
+
+  .project-card.featured { grid-column: span 7; }
+  .project-card.standard { grid-column: span 5; }
+  .project-card.half { grid-column: span 6; }
+
+  .project-number {
+    font-size: 0.6rem;
+    color: var(--muted);
+    letter-spacing: 0.2em;
+    margin-bottom: 1rem;
+  }
+
+  .project-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+  }
+
+  .project-desc {
+    font-size: 0.7rem;
+    color: var(--muted);
+    line-height: 1.9;
+    margin-bottom: 1.5rem;
+  }
+
+  .project-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .project-chain {
+    font-size: 0.6rem;
+    color: var(--accent2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .project-tvl {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .project-link {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.1em;
+    transition: color 0.2s;
+    cursor: none;
+  }
+
+  .project-link:hover { color: var(--accent); }
+
+  .project-badge {
+    position: absolute;
+    top: 1.5rem; right: 1.5rem;
+    font-size: 0.6rem;
+    padding: 0.2rem 0.6rem;
+    background: rgba(0,200,255,0.1);
+    color: var(--accent2);
+    border: 1px solid rgba(0,200,255,0.2);
+    border-radius: 2px;
+    letter-spacing: 0.1em;
+  }
+
+  .project-badge.live { background: rgba(0,255,163,0.1); color: var(--accent); border-color: rgba(0,255,163,0.2); }
+
+  /* EXPERIENCE */
+  .timeline {
+    position: relative;
+    padding-left: 2rem;
+  }
+
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 1px;
+    background: linear-gradient(to bottom, var(--accent), transparent);
+  }
+
+  .timeline-item {
+    position: relative;
+    padding-bottom: 3rem;
+    padding-left: 2rem;
+  }
+
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2rem;
+    top: 6px;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    box-shadow: 0 0 12px rgba(0,255,163,0.5);
+  }
+
+  .timeline-date {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .timeline-role {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+  }
+
+  .timeline-company {
+    font-size: 0.75rem;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .timeline-desc {
+    font-size: 0.7rem;
+    line-height: 1.9;
+    color: var(--muted);
+    max-width: 560px;
+  }
+
+  .timeline-desc li {
+    margin-bottom: 0.4rem;
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .timeline-desc li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 0.65rem;
+  }
+
+  /* CONTACT */
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+  }
+
+  .contact-text .big {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+
+  .contact-text .big span { color: var(--accent); }
+
+  .contact-text p {
+    font-size: 0.75rem;
+    line-height: 1.9;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .contact-links {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: none;
+  }
+
+  .contact-link:hover {
+    border-color: rgba(0,255,163,0.4);
+    background: rgba(0,255,163,0.04);
+  }
+
+  .contact-link-name {
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  .contact-link-handle {
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  .contact-link-arrow {
+    font-size: 0.8rem;
+    color: var(--accent);
+    transition: transform 0.2s;
+  }
+
+  .contact-link:hover .contact-link-arrow { transform: translateX(4px); }
+
+  /* FOOTER */
+  footer {
+    position: relative;
+    z-index: 2;
+    padding: 2rem 4rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  footer p {
+    font-size: 0.65rem;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  footer .accent { color: var(--accent); }
+
+  /* ANIMATIONS */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Terminal text effect */
+  .terminal-line {
+    display: inline;
+  }
+
+  .terminal-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+    margin-left: 2px;
+  }
+
+  /* Chain selector ticker */
+  .ticker {
+    overflow: hidden;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.6rem 0;
+    margin: 0 -4rem;
+  }
+
+  .ticker-inner {
+    display: flex;
+    gap: 3rem;
+    animation: ticker 20s linear infinite;
+    white-space: nowrap;
+    width: max-content;
+  }
+
+  .ticker-item {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .ticker-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.6;
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    nav { padding: 1rem 2rem; }
+    .nav-links { display: none; }
+    section { padding: 4rem 2rem; }
+    .hero { padding: 6rem 2rem 4rem; }
+    .hero-stats { display: none; }
+    .projects-grid { grid-template-columns: 1fr; }
+    .project-card.featured,
+    .project-card.standard,
+    .project-card.half { grid-column: span 1; }
+    .contact-grid { grid-template-columns: 1fr; gap: 2rem; }
+    footer { padding: 1.5rem 2rem; flex-direction: column; gap: 0.5rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursor-ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">wilzeelbub<span>.eth</span></a>
+  <ul class="nav-links">
+    <li><a href="#skills">Stack</a></li>
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#experience">Journey</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-badge">Open to work</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">Web3 Engineer — 5 years on-chain</div>
+    <h1 class="hero-title">
+      <span class="line1">Building the</span>
+      <span class="line2">Decentralized</span>
+      <span class="line3">Future.</span>
+    </h1>
+    <p class="hero-desc">
+      I write <strong>smart contracts</strong>, build <strong>DeFi protocols</strong>, and craft 
+      seamless dApp experiences. From Solidity to zero-knowledge proofs — 
+      I've shipped production code securing <strong>$80M+ TVL</strong> across Ethereum, Solana, and L2s.
+    </p>
+    <div class="hero-ctas">
+      <a href="#projects" class="btn-primary">View Projects →</a>
+      <a href="#contact" class="btn-ghost">Let's Build</a>
+    </div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-number">5+</div>
+      <div class="stat-label">Years Web3</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">23</div>
+      <div class="stat-label">Protocols Shipped</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">$80M</div>
+      <div class="stat-label">TVL Secured</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-number">12</div>
+      <div class="stat-label">Audits Passed</div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <span class="ticker-item"><span class="ticker-dot"></span> Ethereum</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Solana</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Arbitrum</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Optimism</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Polygon</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Base</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> zkSync</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Starknet</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Avalanche</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Hardhat</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Foundry</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> OpenZeppelin</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> The Graph</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Chainlink</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Ethereum</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Solana</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Arbitrum</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Optimism</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Polygon</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Base</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> zkSync</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Starknet</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Avalanche</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Hardhat</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> Foundry</span>
+    <span class="ticker-item"><span class="ticker-dot"></span> OpenZeppelin</span>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">Tech Stack</div>
+  <h2 class="section-title">What I <em>Build</em> With</h2>
+
+  <div class="skills-grid fade-up">
+    <div class="skill-card">
+      <div class="skill-icon">⬡</div>
+      <div class="skill-name">Smart Contracts</div>
+      <p class="skill-desc">Production-grade Solidity and Rust. ERC standards, proxy patterns, gas optimization, reentrancy guards, and multi-sig setups.</p>
+      <div class="skill-tags">
+        <span class="tag">Solidity</span>
+        <span class="tag">Rust</span>
+        <span class="tag">ERC-20/721/1155</span>
+        <span class="tag">EIP-2535</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">◈</div>
+      <div class="skill-name">DeFi Protocols</div>
+      <p class="skill-desc">AMMs, lending markets, yield aggregators, liquid staking, and vault strategies. Deep understanding of protocol economics and attack vectors.</p>
+      <div class="skill-tags">
+        <span class="tag">Uniswap V3</span>
+        <span class="tag">Aave</span>
+        <span class="tag">Compound</span>
+        <span class="tag">Curve</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">◎</div>
+      <div class="skill-name">Zero-Knowledge</div>
+      <p class="skill-desc">Circom circuit design, Groth16 and PLONK proof systems, zkEVM compatibility, and privacy-preserving application logic.</p>
+      <div class="skill-tags">
+        <span class="tag">Circom</span>
+        <span class="tag">SnarkJS</span>
+        <span class="tag">zkSync</span>
+        <span class="tag">Starknet</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">⬡</div>
+      <div class="skill-name">dApp Frontend</div>
+      <p class="skill-desc">Full-stack Web3 UIs with wallet integration, on-chain reads, transaction handling, and real-time indexer subscriptions.</p>
+      <div class="skill-tags">
+        <span class="tag">React</span>
+        <span class="tag">wagmi</span>
+        <span class="tag">ethers.js</span>
+        <span class="tag">The Graph</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">◈</div>
+      <div class="skill-name">Security & Auditing</div>
+      <p class="skill-desc">Slither, Mythril, Echidna fuzzing. Manual review of re-entrancy, flash loan attacks, oracle manipulation, and access control flaws.</p>
+      <div class="skill-tags">
+        <span class="tag">Slither</span>
+        <span class="tag">Echidna</span>
+        <span class="tag">Foundry Fuzz</span>
+        <span class="tag">Audit Review</span>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <div class="skill-icon">◎</div>
+      <div class="skill-name">DevOps & Tooling</div>
+      <p class="skill-desc">End-to-end deployment pipelines, testnet/mainnet deploy scripts, multi-chain config management, and CI/CD for contract suites.</p>
+      <div class="skill-tags">
+        <span class="tag">Hardhat</span>
+        <span class="tag">Foundry</span>
+        <span class="tag">GitHub Actions</span>
+        <span class="tag">Tenderly</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">Selected Work</div>
+  <h2 class="section-title">On-Chain <em>Projects</em></h2>
+
+  <div class="projects-grid fade-up">
+    <div class="project-card featured">
+      <div class="project-badge live">Live</div>
+      <div class="project-number">01 / DeFi Protocol</div>
+      <div class="project-name">NovaDEX<br>Concentrated Liquidity AMM</div>
+      <p class="project-desc">A next-gen AMM with dynamic fee tiers, concentrated liquidity ranges, and on-chain TWAP oracles. Deployed on Arbitrum and Optimism with a custom range order system for limit-order-style trading without centralization.</p>
+      <div class="skill-tags" style="margin-bottom:1.5rem;">
+        <span class="tag">Solidity</span>
+        <span class="tag">Arbitrum</span>
+        <span class="tag">Optimism</span>
+        <span class="tag">UniswapV3 fork</span>
+      </div>
+      <div class="project-meta">
+        <span class="project-chain">Multi-chain · Arbitrum + Optimism</span>
+        <span class="project-tvl">$32M TVL</span>
+        <a href="#" class="project-link">View Protocol →</a>
+      </div>
+    </div>
+
+    <div class="project-card standard">
+      <div class="project-badge">Audited</div>
+      <div class="project-number">02 / Lending</div>
+      <div class="project-name">VaultX<br>Isolated Lending Markets</div>
+      <p class="project-desc">Permissionless isolated lending protocol with risk-adjusted interest rate models and bad-debt socialization mechanisms. Inspired by Euler Finance's architecture with additional circuit-breaker logic.</p>
+      <div class="skill-tags" style="margin-bottom:1.5rem;">
+        <span class="tag">Solidity</span>
+        <span class="tag">Ethereum</span>
+        <span class="tag">Chainlink</span>
+      </div>
+      <div class="project-meta">
+        <span class="project-chain">Ethereum Mainnet</span>
+        <span class="project-tvl">$21M TVL</span>
+        <a href="#" class="project-link">View Docs →</a>
+      </div>
+    </div>
+
+    <div class="project-card half">
+      <div class="project-number">03 / ZK</div>
+      <div class="project-name">ZKPass<br>Private Identity Layer</div>
+      <p class="project-desc">Zero-knowledge proof system for on-chain identity verification without revealing PII. Users prove membership in whitelists without exposing their address history.</p>
+      <div class="skill-tags" style="margin-bottom:1.5rem;">
+        <span class="tag">Circom</span>
+        <span class="tag">Groth16</span>
+        <span class="tag">zkSync</span>
+      </div>
+      <div class="project-meta">
+        <span class="project-chain">zkSync Era</span>
+        <span class="project-tvl">12K users</span>
+        <a href="#" class="project-link">View GitHub →</a>
+      </div>
+    </div>
+
+    <div class="project-card half">
+      <div class="project-number">04 / NFT Infra</div>
+      <div class="project-name">MintFlow<br>Launchpad Protocol</div>
+      <p class="project-desc">Modular NFT launchpad with allowlist merkle proofs, Dutch auction pricing, royalty enforcement, and on-chain reveal logic. Used by 15+ collections.</p>
+      <div class="skill-tags" style="margin-bottom:1.5rem;">
+        <span class="tag">ERC-721A</span>
+        <span class="tag">Merkle</span>
+        <span class="tag">Base</span>
+      </div>
+      <div class="project-meta">
+        <span class="project-chain">Base + Ethereum</span>
+        <span class="project-tvl">$4.2M vol</span>
+        <a href="#" class="project-link">View Protocol →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Career</div>
+  <h2 class="section-title">The <em>Journey</em></h2>
+
+  <div class="timeline fade-up">
+    <div class="timeline-item">
+      <div class="timeline-date">2023 — Present</div>
+      <div class="timeline-role">Lead Smart Contract Engineer</div>
+      <div class="timeline-company">NovaDEX Protocol · Remote</div>
+      <ul class="timeline-desc">
+        <li>Architected and deployed concentrated liquidity AMM securing $32M TVL across two L2 networks</li>
+        <li>Led a team of 4 engineers, established code review standards and security-first development practices</li>
+        <li>Coordinated external security audits with Trail of Bits and OpenZeppelin, resolved all critical/high findings</li>
+        <li>Designed on-chain governance system with timelock controllers and multi-sig execution</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">2021 — 2023</div>
+      <div class="timeline-role">Senior Blockchain Developer</div>
+      <div class="timeline-company">VaultX Labs · Singapore (Remote)</div>
+      <ul class="timeline-desc">
+        <li>Built isolated lending market protocol from scratch, shipped to mainnet in 8 months</li>
+        <li>Implemented dynamic interest rate model with utilization-based curves and oracle risk scoring</li>
+        <li>Wrote 98% test coverage Foundry suite with fuzz testing and invariant checks</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">2020 — 2021</div>
+      <div class="timeline-role">Smart Contract Developer</div>
+      <div class="timeline-company">Freelance / Independent</div>
+      <ul class="timeline-desc">
+        <li>Delivered 8 production smart contract projects for DeFi startups and NFT platforms</li>
+        <li>Built NFT staking vaults, token vesting contracts, and multi-sig treasury systems</li>
+        <li>Began specializing in gas optimization — consistently achieved 30–50% reduction vs naive implementations</li>
+      </ul>
+    </div>
+
+    <div class="timeline-item">
+      <div class="timeline-date">2019 — 2020</div>
+      <div class="timeline-role">Junior Web Developer → Web3 Transition</div>
+      <div class="timeline-company">Full-stack Agency · Jakarta</div>
+      <ul class="timeline-desc">
+        <li>Started career in traditional full-stack development (React, Node.js, PostgreSQL)</li>
+        <li>Discovered Ethereum in late 2019, self-taught Solidity and deployed first contract on Ropsten</li>
+        <li>Completed CryptoZombies, Ethernaut, and Damn Vulnerable DeFi — pivoted full-time to Web3</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="section-label">Get In Touch</div>
+
+  <div class="contact-grid fade-up">
+    <div class="contact-text">
+      <div class="big">Let's ship<br><span>on-chain.</span></div>
+      <p>Open to senior engineering roles, protocol consulting, and audit prep engagements. DeFi, ZK, and L2 infrastructure are my sweet spots. Based in Indonesia — working globally.</p>
+      <a href="mailto:wilzeelbub@web3.dev" class="btn-primary">Send a Message →</a>
+    </div>
+
+    <div class="contact-links">
+      <a href="#" class="contact-link">
+        <span class="contact-link-name">GitHub</span>
+        <span class="contact-link-handle">github.com/wilzeelbub</span>
+        <span class="contact-link-arrow">→</span>
+      </a>
+      <a href="#" class="contact-link">
+        <span class="contact-link-name">Twitter / X</span>
+        <span class="contact-link-handle">@wilzeelbub</span>
+        <span class="contact-link-arrow">→</span>
+      </a>
+      <a href="#" class="contact-link">
+        <span class="contact-link-name">LinkedIn</span>
+        <span class="contact-link-handle">linkedin.com/in/wilzeelbub</span>
+        <span class="contact-link-arrow">→</span>
+      </a>
+      <a href="#" class="contact-link">
+        <span class="contact-link-name">Telegram</span>
+        <span class="contact-link-handle">@wilzeelbub</span>
+        <span class="contact-link-arrow">→</span>
+      </a>
+      <a href="#" class="contact-link">
+        <span class="contact-link-name">Resume / CV</span>
+        <span class="contact-link-handle">Download PDF</span>
+        <span class="contact-link-arrow">↓</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>© 2025 <span class="accent">wilzeelbub.eth</span> — Built with Syne + Space Mono</p>
+  <p>All contracts DYOR. Not financial advice.</p>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%,-50%) scale(2)';
+      ring.style.width = '60px';
+      ring.style.height = '60px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%,-50%) scale(1)';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+    });
+  });
+
+  // Scroll fade
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Duplicate ticker for seamless loop
+  const ticker = document.getElementById('ticker');
+  ticker.innerHTML += ticker.innerHTML;
+</script>
+</body>
+</html>
